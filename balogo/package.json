@@ -1,0 +1,37 @@
+{
+  "name": "@alintec/koishi-plugin-balogo",
+  "description": "带审核的balogo生成器",
+  "version": "1.0.1",
+  "main": "lib/index.js",
+  "typings": "lib/index.d.ts",
+  "files": [
+    "lib",
+    "dist",
+    "public"
+  ],
+  "license": "MIT",
+  "keywords": [
+    "chatbot",
+    "koishi",
+    "plugin"
+  ],
+  "peerDependencies": {
+    "koishi": "^4.16.0"
+  },
+  "koishi": {
+    "description": {
+      "zh": "带审核的碧蓝档案 Logo 生成器",
+      "en": "BlueArchive-style Logo Generater with Audit"
+    },
+    "service": {
+      "required": [
+        "puppeteer"
+      ]
+    },
+    "locales": [
+      "zh",
+      "en",
+      "jp"
+    ]
+  }
+}
