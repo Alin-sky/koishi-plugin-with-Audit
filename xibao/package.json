@@ -1,7 +1,7 @@
 {
   "name": "@alintec/koishi-plugin-xibao",
   "description": "带百度审核的喜报悲报",
-  "version": "1.0.0",
+  "version": "1.0.2",
   "main": "lib/index.js",
   "typings": "lib/index.d.ts",
   "files": [

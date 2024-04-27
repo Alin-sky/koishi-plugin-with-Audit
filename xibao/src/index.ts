@@ -51,8 +51,8 @@ export const Config = Schema.object({
         }).description('自定义后端')
       ])
     }).description('审核配置'),
-
   returns: Schema.string().default('输入内容可能有问题(◎﹏◎)').description('不合规的返回内容'),
+
   xibao: Schema.object({
     fontFamily: Schema.string().default('"HarmonyOS Sans SC", "Source Han Sans CN", sans-serif')
       .description('字体（参照 CSS 中的 [font-family](https://developer.mozilla.org/zh-CN/docs/Web/CSS/font-family) ）'),
@@ -114,21 +114,21 @@ export async function apply(ctx: Context, config: Config) {
     } catch (error) { logger.info(error) }
   }
   await tokens()
+  
   async function process_baidu(text: string): Promise<string> {
-    const params = {
-      text: text
-    };
     const accessToken = token
     const urls = `${baiduapi}?access_token=${accessToken}`;
     const configs = {
       headers: {
-        'Content-Type': 'application/x-www-form-urlencoded'
+        "Accept": "application/json",
+        "Content-Type": "application/x-www-form-urlencoded"
       }
     };
-    const post = await ctx.http.post(urls, params, configs)
-      .catch(error => {
-        logger.info('请求失败:', error);
-      });
+    // 使用 URLSearchParams 格式化数据
+    const data = new URLSearchParams();
+    data.append('text', text);
+    const post = await ctx.http.post(urls, data, configs);
+    console.log(await post)
     if (post.conclusion == '不合规') {
       logger.info('内容不合规')
       logger.info(post)

@@ -83,20 +83,19 @@ async function apply(ctx, config) {
     }
     await tokens();
     async function process_baidu(text) {
-        const params = {
-            text: text
-        };
         const accessToken = token;
         const urls = `${baiduapi}?access_token=${accessToken}`;
         const configs = {
             headers: {
-                'Content-Type': 'application/x-www-form-urlencoded'
+                "Accept": "application/json",
+                "Content-Type": "application/x-www-form-urlencoded"
             }
         };
-        const post = await ctx.http.post(urls, params, configs)
-            .catch(error => {
-            logger.info('请求失败:', error);
-        });
+        // 使用 URLSearchParams 格式化数据
+        const data = new URLSearchParams();
+        data.append('text', text);
+        const post = await ctx.http.post(urls, data, configs);
+        console.log(await post);
         if (post.conclusion == '不合规') {
             logger.info('内容不合规');
             logger.info(post);
