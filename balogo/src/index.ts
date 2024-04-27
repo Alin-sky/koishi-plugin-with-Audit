@@ -90,7 +90,7 @@ async function validator(texts: string[], session: Session): Promise<Results[]> 
 }
 
 
-const baiduapi = 'https://aip.baidubce.com/rest/2.0/solution/v1/text_censor/v2/user_defined'
+const baiduapi = "https://aip.baidubce.com/rest/2.0/solution/v1/text_censor/v2/user_defined"
 const baidu_token_url = 'https://aip.baidubce.com/oauth/2.0/token'
 
 
@@ -113,29 +113,27 @@ export async function apply(ctx: Context, config: Config) {
     } catch (error) { logger.info(error) }
   }
   await tokens()
+
   async function process_baidu(text: string): Promise<string> {
-    const params = {
-      text: text
-    };
     const accessToken = token
     const urls = `${baiduapi}?access_token=${accessToken}`;
     const configs = {
       headers: {
-        'Content-Type': 'application/x-www-form-urlencoded'
+        "Accept": "application/json",
+        "Content-Type": "application/x-www-form-urlencoded"
       }
     };
-    const post = await ctx.http.post(urls, params, configs)
-      .catch(error => {
-        logger.info('请求失败:', error);
-      });
+    // 使用 URLSearchParams 格式化数据
+    const data = new URLSearchParams();
+    data.append('text', text);
+    const post = await ctx.http.post(urls, data, configs);
+    console.log(await post)
     if (post.conclusion == '不合规') {
       logger.info('内容不合规')
       logger.info(post)
     }
     return post.conclusion
   }
-
-
 
   ctx.i18n.define('zh', require('./locales/zh-CN'))
   ctx.i18n.define('en', require('./locales/en-US'))
@@ -148,15 +146,27 @@ export async function apply(ctx: Context, config: Config) {
     .option('haloX', '-x <x:number>')
     .option('haloY', '-y <y:number>')
     .action(async ({ session, options }, textL, textR) => {
-
-      const text = textL+textR
       //审核
-      const process_out = await process_baidu(text)
-      console.log(process_out)
-      if (process_out == '不合规') {
-        return user_out_mess
+      if (textL == null || textR == null) {
+        let qhelptext = ''
+        if (session.event.platform == 'qq') {
+          qhelptext = '@机器人/'
+        }
+        return `
+呜呜，输入不完整
+使用方法：${qhelptext}balogo [文字1] [文字2]
+中间使用空格分隔哦
+示例：${qhelptext}balogo 碧蓝 档案
+        `
+      } else {
+        const text = textL + textR
+        console.log(text)
+        const process_out = await process_baidu(text)
+        console.log(process_out)
+        if (process_out == '不合规') {
+          return user_out_mess
+        }
       }
-      //
 
       const results = await validator([textL, textR], session)
 
